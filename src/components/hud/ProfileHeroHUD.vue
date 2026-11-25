@@ -6,6 +6,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { gsap } from 'gsap'
 import ViewModeToggle from './ViewModeToggle.vue'
+import MusicToggle from './MusicToggle.vue'
 import RelicArt from '@/components/art/RelicArt.vue'
 import { projects } from '@/data/projects'
 import { careerTimeline } from '@/data/careerTimeline'
@@ -122,6 +123,7 @@ onUnmounted(() => {
       </nav>
 
       <div class="flex items-center gap-2">
+        <MusicToggle />
         <span class="hidden sm:inline-flex"><ViewModeToggle /></span>
         <span class="inline-flex sm:hidden"><ViewModeToggle compact /></span>
         <button

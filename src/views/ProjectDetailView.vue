@@ -7,6 +7,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { gsap } from 'gsap'
 import RelicArt from '@/components/art/RelicArt.vue'
 import ContactFooter from '@/components/footer/ContactFooter.vue'
+import MusicToggle from '@/components/hud/MusicToggle.vue'
 import { findProjectBySlug, projects } from '@/data/projects'
 import { careerTimeline } from '@/data/careerTimeline'
 import { useGallerySceneControls } from '@/composables/useGalleryScene'
@@ -82,7 +83,10 @@ onUnmounted(() => {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7" /></svg>
           Return to Archive
         </RouterLink>
-        <span class="font-mono text-[0.62rem] tracking-[0.3em] text-mist uppercase">Relic Dossier</span>
+        <div class="flex items-center gap-3">
+          <span class="hidden font-mono text-[0.62rem] tracking-[0.3em] text-mist uppercase sm:inline">Relic Dossier</span>
+          <MusicToggle />
+        </div>
       </div>
     </header>
 

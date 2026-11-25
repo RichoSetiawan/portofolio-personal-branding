@@ -44,6 +44,20 @@ Required fields: `id`, `title`, `epithet`, `category`, `year`, `status` and `sum
 - **Mistake check:** in `npm run dev`, mistakes such as a duplicate id, an unknown `careerId` or a bad URL are reported in the browser console as `[portfolio data] …`.
 - **Many projects:** tested with 18. Scroll length per card shrinks as the list grows, capped at about 5 screens. Only the cards near the centre are drawn, and the phone grid uses 2 columns.
 
+### Background music
+
+1. Put the audio file in `public/audio/`, for example `public/audio/ex-nihilo.mp3`. The file is **not** included in this repo.
+2. Set the title, artist, volume and credit in `src/data/backgroundMusic.ts`. Set `src: ''` to remove the feature.
+
+How it behaves:
+- It never autoplays on a first visit. Visitors start it with the ♪ button in the top bar.
+- Their choice is remembered. If they left it on, it resumes on their first click.
+- It fades in and out (on iPhone too), pauses while the tab is hidden, and keeps playing across page changes.
+- It only downloads when someone presses play.
+- If the file is missing, the button is hidden on the live site. In `npm run dev` it shows dimmed with a hint.
+
+⚠️ "Ex Nihilo" (HOYO-MiX) is © HoYoverse. Putting the file on a public website, or in a public Git repo, redistributes it. Check that you have permission (HoYoverse fan-content policy) before you deploy, or use a track you have rights to.
+
 ### 3D Stage controls
 
 The stage pins to the screen while you scroll the page, and scrolling turns the cards. The mouse wheel, trackpad, a finger on a phone and the scrollbar all work. It settles on the nearest card when you stop, one wheel notch or short flick per card. After the last card the page continues normally. You can also use a horizontal trackpad swipe, arrow keys or Home/End, the ‹ › buttons, or click the progress bar. Clicking a side card brings it to the centre, and clicking the centre card unveils it.
