@@ -11,14 +11,14 @@ export const socialLinks: SocialLink[] = [
     platform: 'linkedin',
     label: 'LinkedIn',
     handle: 'in/your-handle',
-    url: 'https://www.linkedin.com/in/your-handle',
+    url: 'https://www.linkedin.com/in/richosetiawan/',
     ariaLabel: 'Richo Setiawan on LinkedIn (opens in a new tab)',
   },
   {
     platform: 'github',
     label: 'GitHub',
     handle: '@your-handle',
-    url: 'https://github.com/your-handle',
+    url: 'https://github.com/RichoSetiawan',
     ariaLabel: 'Richo Setiawan on GitHub (opens in a new tab)',
   },
   {
