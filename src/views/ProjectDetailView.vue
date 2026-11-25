@@ -149,23 +149,27 @@ onUnmounted(() => {
             <p class="block-text">{{ project.description }}</p>
           </article>
 
-          <article class="dossier-block hud-panel hud-cut" data-enter>
+          <article v-if="project.architecture.length" class="dossier-block hud-panel hud-cut" data-enter>
             <h2 class="block-h">Architecture</h2>
             <ul class="block-list">
               <li v-for="a in project.architecture" :key="a">{{ a }}</li>
             </ul>
           </article>
 
-          <article class="dossier-block hud-panel hud-cut" data-enter>
+          <article v-if="project.highlights.length" class="dossier-block hud-panel hud-cut" data-enter>
             <h2 class="block-h">Highlights</h2>
             <ul class="block-list">
               <li v-for="h in project.highlights" :key="h">{{ h }}</li>
             </ul>
           </article>
 
-          <article class="dossier-block hud-panel hud-cut lg:col-span-2" data-enter>
-            <h2 class="block-h">Tech Stack</h2>
-            <ul class="mt-4 flex flex-wrap gap-2" role="list">
+          <article
+            v-if="project.techStack.length || milestone"
+            class="dossier-block hud-panel hud-cut lg:col-span-2"
+            data-enter
+          >
+            <h2 class="block-h">{{ project.techStack.length ? 'Tech Stack' : 'Origin' }}</h2>
+            <ul v-if="project.techStack.length" class="mt-4 flex flex-wrap gap-2" role="list">
               <li v-for="t in project.techStack" :key="t" class="chip">{{ t }}</li>
             </ul>
             <RouterLink

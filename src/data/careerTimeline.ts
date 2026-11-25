@@ -7,6 +7,7 @@ export const TIMELINE_END = 2026
 /**
  * Career & Education Chronicle (2022 – 2026).
  * Highlights below are written generically — tune them to your actual experience.
+ * Projects appear under a milestone automatically via their `careerId` in projects.ts.
  */
 export const careerTimeline: CareerMilestone[] = [
   {
@@ -31,7 +32,6 @@ export const careerTimeline: CareerMilestone[] = [
       'Built coursework and team projects across web, database and process design',
       'Graduated into a finance-industry career path',
     ],
-    connectedProjectIds: ['sigil-registry', 'carnival-queue'],
     sigil: 'quill',
     accent: 'gold',
   },
@@ -52,7 +52,6 @@ export const careerTimeline: CareerMilestone[] = [
       'Worked with code review, testing and release processes at bank scale',
       'Collaborated with business units to translate requirements into features',
     ],
-    connectedProjectIds: ['ledger-oracle', 'masquerade-gate'],
     sigil: 'vault',
     accent: 'crimson',
   },
@@ -73,7 +72,6 @@ export const careerTimeline: CareerMilestone[] = [
       'Hub for ongoing work and linked portfolio items',
       'Bridging operational needs with digital solutions',
     ],
-    connectedProjectIds: ['credit-compass', 'trailblaze-archive'],
     sigil: 'compass',
     accent: 'gold',
   },

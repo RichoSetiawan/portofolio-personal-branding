@@ -104,7 +104,7 @@ function backToTop() {
   flex-direction: column;
   align-items: center;
   gap: 0.6rem;
-  width: 104px;
+  width: clamp(92px, 27vw, 104px);
   padding: 1.1rem 0.5rem 0.9rem;
   color: var(--color-starlight);
   text-decoration: none;

@@ -19,10 +19,34 @@ All content is data-driven. You should rarely need to touch components.
 | Career & education chronicle 2022–2026 | `src/data/careerTimeline.ts` |
 | Contact Me social links | `src/data/socialLinks.ts` |
 
-- **Before publishing:** replace every `your-handle` in `socialLinks.ts`. Projects other than *Trailblaze Archive* are **sample entries** with `https://example.com` placeholder URLs.
-- `trailblaze: { type: 'external', url }` opens a new tab. `{ type: 'internal', route }` navigates inside the app.
-- `motif` picks the card emblem: `astrolabe`, `seer-eye`, `fool-mask`, `golden-key`, `chalice` or `carnival-dice`. Set `imageUrl` to use your own illustration instead. Put the file in `public/` and reference it as `/relics/foo.webp`.
-- `careerId` links a project to a timeline milestone. Add the project id to that milestone's `connectedProjectIds` so the link works both ways.
+- **Before publishing:** replace the remaining `your-handle` entries in `socialLinks.ts`. Projects other than *Trailblaze Archive* are **sample entries** with `https://example.com` placeholder URLs.
+
+### Adding a project
+
+Add one object to the array in `src/data/projects.ts`. The comment at the top of that file has a copy-paste template. Nothing else needs editing. The card, its 3D stage slot, the astrolabe node, the modal, the `/projects/<id>` page and the career-timeline link are all generated from it.
+
+Required fields: `id`, `title`, `epithet`, `category`, `year`, `status` and `summary`. Everything else is filled in automatically when you leave it out:
+
+| Field | Default |
+| --- | --- |
+| `arcana` | Tarot numeral from the project's position in the array: 0, I, II … XXI, XXII … |
+| `slug` | Same as `id` |
+| `motif` | Rotates through the six emblems (`astrolabe`, `seer-eye`, `fool-mask`, `golden-key`, `chalice`, `carnival-dice`) |
+| `accent` | Alternates gold and crimson |
+| `trailblaze` | The project's own dossier page |
+| `description` | Same as `summary` |
+| `architecture`, `highlights`, `techStack` | Empty. The matching sections are hidden. |
+
+- **Order:** array order is the order on the stage and in the grid, and it sets the numerals. Set `arcana: 'XIII'` yourself if you want a fixed numeral.
+- **Career link:** `careerId: 'ukrida' | 'bca' | 'fifgroup'` makes the project appear under that milestone automatically.
+- **Trailblaze button:** `{ type: 'external', url }` opens a new tab. `{ type: 'internal', route }` navigates inside the app.
+- **Custom art:** `imageUrl: '/relics/foo.webp'` (file in `public/relics/`) replaces the SVG emblem.
+- **Mistake check:** in `npm run dev`, mistakes such as a duplicate id, an unknown `careerId` or a bad URL are reported in the browser console as `[portfolio data] …`.
+- **Many projects:** tested with 18. Scroll length per card shrinks as the list grows, capped at about 5 screens. Only the cards near the centre are drawn, and the phone grid uses 2 columns.
+
+### 3D Stage controls
+
+The stage pins to the screen while you scroll the page, and scrolling turns the cards. The mouse wheel, trackpad, a finger on a phone and the scrollbar all work. It settles on the nearest card when you stop, one wheel notch or short flick per card. After the last card the page continues normally. You can also use a horizontal trackpad swipe, arrow keys or Home/End, the ‹ › buttons, or click the progress bar. Clicking a side card brings it to the centre, and clicking the centre card unveils it.
 
 ## Structure
 

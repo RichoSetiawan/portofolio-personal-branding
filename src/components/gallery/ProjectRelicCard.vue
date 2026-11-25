@@ -105,6 +105,7 @@ defineExpose({ el: cardEl })
   --mx: 50%;
   --my: 30%;
   --hud-cut: 18px;
+  container: relic / inline-size;
   position: relative;
   display: block;
   width: 100%;
@@ -200,7 +201,6 @@ defineExpose({ el: cardEl })
   min-height: 0;
   display: block;
   padding: 0.25rem 0.5rem 0;
-  transform: translateZ(30px);
 }
 
 /* ---------- plate ---------- */
@@ -304,5 +304,43 @@ defineExpose({ el: cardEl })
 .relic-card.is-active :deep(.emblem) {
   transform: scale(1.05);
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--relic-accent) 55%, transparent));
+}
+
+/* ---------- small cards (2-column phone grid, compact stage) ---------- */
+@container relic (max-width: 260px) {
+  .relic-epithet {
+    font-size: 0.8rem;
+  }
+  .relic-category {
+    letter-spacing: 0.14em;
+  }
+}
+@container relic (max-width: 210px) {
+  .relic-rim,
+  .relic-body {
+    --hud-cut: 12px;
+  }
+  .relic-inner {
+    inset: 5px;
+  }
+  .relic-crown {
+    padding: 0.55rem 0.6rem 0;
+  }
+  .relic-numeral {
+    font-size: 0.8rem;
+  }
+  .relic-category,
+  .relic-epithet,
+  .relic-cue {
+    display: none;
+  }
+  .relic-plate {
+    padding: 0.45rem 0.5rem 0.6rem;
+  }
+  .relic-title {
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    line-height: 1.25;
+  }
 }
 </style>

@@ -9,7 +9,7 @@
 import { computed, nextTick, ref } from 'vue'
 import RelicArt from '@/components/art/RelicArt.vue'
 import { careerTimeline, TIMELINE_END, TIMELINE_START } from '@/data/careerTimeline'
-import { findProjectsByIds } from '@/data/projects'
+import { projectsForMilestone } from '@/data/projects'
 import { useProjectModal } from '@/composables/useProjectModal'
 import { useReducedMotion } from '@/composables/useReducedMotion'
 import { vReveal } from '@/directives/reveal'
@@ -23,7 +23,7 @@ const hoveredId = ref<CareerId | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
 
 const selected = computed(() => careerTimeline.find((m) => m.id === selectedId.value)!)
-const connected = computed(() => findProjectsByIds(selected.value.connectedProjectIds))
+const connected = computed(() => projectsForMilestone(selected.value))
 
 /** Columns = each year in range, inclusive. */
 const years = Array.from({ length: TIMELINE_END - TIMELINE_START + 1 }, (_, i) => TIMELINE_START + i)
@@ -43,7 +43,7 @@ const isNarrow = (m: CareerMilestone) => ((m.endYear ?? TIMELINE_END) + 1 - m.st
 
 async function select(id: CareerId, scroll = false) {
   selectedId.value = id
-  if (scroll && window.innerWidth < 768) {
+  if (scroll && window.innerWidth < 900) {
     await nextTick()
     panelEl.value?.scrollIntoView({ behavior: reduced.value ? 'auto' : 'smooth', block: 'nearest' })
   }
@@ -393,7 +393,7 @@ function onTabKey(e: KeyboardEvent, index: number) {
   color: var(--color-mist);
   white-space: nowrap;
 }
-@media (min-width: 768px) {
+@media (min-width: 900px) {
   .lane.is-narrow .lane-role,
   .lane.is-narrow .lane-period {
     display: none;
@@ -572,7 +572,7 @@ function onTabKey(e: KeyboardEvent, index: number) {
 }
 
 /* ---------- desktop: hover tooltip above the bar ---------- */
-@media (min-width: 768px) {
+@media (min-width: 900px) {
   .lane {
     z-index: 1;
   }
@@ -612,7 +612,7 @@ function onTabKey(e: KeyboardEvent, index: number) {
 }
 
 /* ---------- mobile: vertical chronicle ---------- */
-@media (max-width: 767px) {
+@media (max-width: 899px) {
   .chronicle {
     padding: 1rem;
   }

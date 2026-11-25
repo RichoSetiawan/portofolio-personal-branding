@@ -1,21 +1,45 @@
-import type { Project } from '@/types/portfolio'
+import type { CareerMilestone, Project } from '@/types/portfolio'
+import { defineProjects } from './defineProjects'
 
 /**
  * Relic Archive — project showcase data.
  *
- * ⚠️ Entries other than "Trailblaze Archive" are SAMPLE content that shows the
- * shape of a project. Replace titles, descriptions, stacks and URLs with your
- * real work. `https://example.com/...` links are placeholders on purpose.
+ * ── ADDING A PROJECT ───────────────────────────────────────────────────────
+ * Copy this block into the array below. That's the only file you need to touch:
+ * the card, 3D stage slot, astrolabe node, modal, /projects/<id> page and the
+ * career-timeline link are all generated from it.
  *
- * Trailblaze behaviour:
- *   { type: 'external', url }  → window.open(url, '_blank', 'noopener,noreferrer')
- *   { type: 'internal', route } → router.push(route)
+ *   {
+ *     id: 'my-new-project',                 // unique, kebab-case → URL /projects/my-new-project
+ *     title: 'My New Project',
+ *     epithet: 'One short poetic line',      // card front, keep it < 60 chars
+ *     category: 'Web App',
+ *     year: 2026,
+ *     status: 'Live',                        // 'Live' | 'In Progress' | 'Archived' | 'Prototype'
+ *     summary: 'One or two sentences.',
+ *     // ── all optional ──
+ *     description: 'Longer text for the modal & dossier.',   // default: summary
+ *     architecture: ['…'], highlights: ['…'], techStack: ['Vue 3'],
+ *     trailblaze: { type: 'external', url: 'https://…' },   // default: its own dossier page
+ *     repoUrl: 'https://github.com/…',
+ *     careerId: 'fifgroup',                  // 'ukrida' | 'bca' | 'fifgroup' → shows under that milestone
+ *     motif: 'golden-key',                   // default: rotates through the 6 emblems
+ *     accent: 'gold',                        // default: alternates gold / crimson
+ *     imageUrl: '/relics/my-art.webp',       // optional custom art (put the file in /public/relics)
+ *     arcana: 'XIII',                        // default: numeral from array position (0, I, II …)
+ *   },
+ *
+ * Array order = order on the stage/grid and the automatic arcana numerals.
+ * In dev, mistakes (duplicate ids, unknown careerId, bad URLs…) are reported
+ * in the browser console as "[portfolio data] …".
+ * ───────────────────────────────────────────────────────────────────────────
+ *
+ * ⚠️ Entries other than "Trailblaze Archive" are SAMPLE content. Replace them
+ * with your real work — `https://example.com/...` links are placeholders.
  */
-export const projects: Project[] = [
+export const projects: Project[] = defineProjects([
   {
     id: 'trailblaze-archive',
-    slug: 'trailblaze-archive',
-    arcana: '0',
     title: 'Trailblaze Archive',
     epithet: 'A star-chart of every path walked',
     category: 'Creative Frontend',
@@ -34,18 +58,15 @@ export const projects: Project[] = [
       'Tailwind v4 theme tokens enforcing a strict 60:30:10 palette',
     ],
     highlights: [
-      'WebGL capability check with an automatic 2D gallery fallback',
-      'Respects prefers-reduced-motion across canvas and GSAP',
-      'Keyboard-navigable 3D stage, focus-trapped modal, aria-labelled controls',
+      'Scroll-driven 3D stage that also works with touch, swipe and keyboard',
+      'WebGL capability check with a CSS fallback; respects prefers-reduced-motion',
+      'Focus-trapped modal and aria-labelled controls throughout',
     ],
     techStack: ['Vue 3', 'TypeScript', 'Three.js', 'GSAP', 'Tailwind CSS', 'Vite'],
-    trailblaze: { type: 'internal', route: '/projects/trailblaze-archive' },
     repoUrl: 'https://example.com/trailblaze-archive',
   },
   {
     id: 'ledger-oracle',
-    slug: 'ledger-oracle',
-    arcana: 'II',
     title: 'Ledger Oracle',
     epithet: 'The eye that reads every transaction',
     category: 'Internal Tooling',
@@ -73,8 +94,6 @@ export const projects: Project[] = [
   },
   {
     id: 'masquerade-gate',
-    slug: 'masquerade-gate',
-    arcana: 'V',
     title: 'Masquerade Gate',
     epithet: 'Every guest wears a verified mask',
     category: 'Identity & Access',
@@ -102,8 +121,6 @@ export const projects: Project[] = [
   },
   {
     id: 'credit-compass',
-    slug: 'credit-compass',
-    arcana: 'X',
     title: 'Credit Compass',
     epithet: 'A golden key for every application',
     category: 'Finance Workflow',
@@ -126,13 +143,10 @@ export const projects: Project[] = [
       'Built alongside business stakeholders during MT rotation',
     ],
     techStack: ['Laravel', 'MySQL', 'Vue 3', 'Tailwind CSS'],
-    trailblaze: { type: 'internal', route: '/projects/credit-compass' },
     careerId: 'fifgroup',
   },
   {
     id: 'sigil-registry',
-    slug: 'sigil-registry',
-    arcana: 'XVII',
     title: 'Sigil Registry',
     epithet: 'Where scholars inscribe their names',
     category: 'Information System',
@@ -160,8 +174,6 @@ export const projects: Project[] = [
   },
   {
     id: 'carnival-queue',
-    slug: 'carnival-queue',
-    arcana: 'XXI',
     title: 'Carnival Queue',
     epithet: 'Roll the dice, take your seat',
     category: 'Event Platform',
@@ -169,8 +181,7 @@ export const projects: Project[] = [
     status: 'Prototype',
     motif: 'carnival-dice',
     accent: 'crimson',
-    summary:
-      'Sample entry — an event ticketing and queue app for campus festivals.',
+    summary: 'Sample entry — an event ticketing and queue app for campus festivals.',
     description:
       'Sample entry: replace with a real project. A mobile-first ticketing app with QR check-in, a live queue board and organiser analytics for campus events.',
     architecture: [
@@ -178,19 +189,17 @@ export const projects: Project[] = [
       'Realtime queue board over WebSockets',
       'Organiser dashboard with attendance analytics',
     ],
-    highlights: [
-      'QR check-in for fast entry',
-      'Live queue position updates',
-      'Attendance insights for organisers',
-    ],
+    highlights: ['QR check-in for fast entry', 'Live queue position updates', 'Attendance insights for organisers'],
     techStack: ['Vue 3', 'Firebase', 'WebSockets', 'Tailwind CSS'],
     trailblaze: { type: 'external', url: 'https://example.com/carnival-queue' },
     careerId: 'ukrida',
   },
-]
+])
 
-export const findProjectBySlug = (slug: string): Project | undefined =>
-  projects.find((p) => p.slug === slug)
+export const findProjectBySlug = (slug: string): Project | undefined => projects.find((p) => p.slug === slug)
 
-export const findProjectsByIds = (ids: string[]): Project[] =>
-  ids.map((id) => projects.find((p) => p.id === id)).filter((p): p is Project => Boolean(p))
+/** Projects shown under a career milestone: everything with that `careerId`, plus any extra ids it lists. */
+export function projectsForMilestone(m: CareerMilestone): Project[] {
+  const extra = new Set(m.connectedProjectIds ?? [])
+  return projects.filter((p) => p.careerId === m.id || extra.has(p.id))
+}

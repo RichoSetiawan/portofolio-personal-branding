@@ -107,7 +107,7 @@ async function playOpen() {
   gsap.set(staggered, { autoAlpha: 0, y: 18 })
 
   openTl
-    .fromTo(backdropEl.value, { opacity: 0 }, { opacity: 1, duration: 0.45, ease: 'power2.out' }, 0)
+    .fromTo([backdropEl.value, closeBtn.value], { opacity: 0 }, { opacity: 1, duration: 0.45, ease: 'power2.out' }, 0)
     // 1. Lift — rise from the slot and flip to the sigil back
     .fromTo(
       card,
@@ -166,7 +166,7 @@ function close() {
       { y: -window.innerHeight * 0.55, scale: 0.7, rotateY: 180, rotateZ: 8, autoAlpha: 0, duration: 0.5, ease: 'power3.in' },
       '<0.05',
     )
-    .to([raysEl.value, backdropEl.value], { opacity: 0, duration: 0.35, ease: 'power1.in' }, '<0.15')
+    .to([raysEl.value, backdropEl.value, closeBtn.value], { opacity: 0, duration: 0.35, ease: 'power1.in' }, '<0.15')
 }
 
 /* ---------- trailblaze ---------- */
@@ -221,7 +221,7 @@ function onKeydown(e: KeyboardEvent) {
 }
 
 watch(project, (p, prev) => {
-  if (p && p !== prev) playOpen()
+  if (p && p !== prev) void playOpen()
   if (!p) unlockScroll()
 })
 
@@ -246,6 +246,10 @@ onUnmounted(() => {
     >
       <div ref="backdropEl" class="hsr-backdrop" @click="close" />
       <div ref="raysEl" class="hsr-rays" aria-hidden="true" />
+      <!-- fixed to the viewport so it's always reachable on phones -->
+      <button ref="closeBtn" type="button" class="hsr-close" aria-label="Close relic dossier" @click="close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+      </button>
 
       <div class="hsr-layout" @click.self="close">
         <!-- ============ the dropped card ============ -->
@@ -298,9 +302,6 @@ onUnmounted(() => {
         <!-- ============ dossier panel ============ -->
         <div ref="panelEl" class="hsr-panel-wrap">
           <div class="hsr-panel hud-panel hud-cut">
-            <button ref="closeBtn" type="button" class="hsr-close" aria-label="Close relic dossier" @click="close">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
-            </button>
 
             <header data-stagger>
               <p class="panel-kicker">
@@ -318,14 +319,14 @@ onUnmounted(() => {
 
             <p class="panel-desc" data-stagger>{{ project.description }}</p>
 
-            <div class="panel-cols" data-stagger>
-              <section>
+            <div v-if="project.architecture.length || project.highlights.length" class="panel-cols" data-stagger>
+              <section v-if="project.architecture.length">
                 <h3 class="panel-h3">Architecture</h3>
                 <ul class="panel-list">
                   <li v-for="item in project.architecture" :key="item">{{ item }}</li>
                 </ul>
               </section>
-              <section>
+              <section v-if="project.highlights.length">
                 <h3 class="panel-h3">Highlights</h3>
                 <ul class="panel-list">
                   <li v-for="item in project.highlights" :key="item">{{ item }}</li>
@@ -333,7 +334,7 @@ onUnmounted(() => {
               </section>
             </div>
 
-            <section data-stagger class="mt-6">
+            <section v-if="project.techStack.length" data-stagger class="mt-6">
               <h3 class="panel-h3">Tech Stack</h3>
               <ul class="mt-3 flex flex-wrap gap-2" role="list">
                 <li v-for="tech in project.techStack" :key="tech" class="chip">{{ tech }}</li>
@@ -613,15 +614,16 @@ onUnmounted(() => {
       border-box;
 }
 .hsr-close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  z-index: 5;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  color: var(--color-mist);
-  background: rgba(10, 9, 20, 0.6);
+  width: 44px;
+  height: 44px;
+  color: var(--color-starlight);
+  background: rgba(10, 9, 20, 0.85);
   border: 1px solid var(--color-frame);
   cursor: pointer;
   transition:
@@ -644,7 +646,6 @@ onUnmounted(() => {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.4rem;
-  padding-right: 3rem;
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.22em;
@@ -785,11 +786,34 @@ onUnmounted(() => {
     grid-template-columns: 1fr;
     align-items: start;
     align-content: start;
-    padding-top: 2.5rem;
-    padding-bottom: 2.5rem;
+    gap: 1.25rem;
+    padding: 4.25rem 1rem max(2rem, env(safe-area-inset-bottom));
   }
   .hsr-card {
-    width: min(230px, 58vw);
+    --hud-cut: 16px;
+    width: min(190px, 48vw);
+  }
+  .front-cat {
+    display: none;
+  }
+  .front-crown {
+    padding: 0.7rem 0.75rem 0;
+  }
+  .front-plate {
+    padding: 0.6rem 0.6rem 0.8rem;
+  }
+  .front-title {
+    font-size: 0.92rem;
+    letter-spacing: 0.05em;
+  }
+  .hsr-panel {
+    padding: 1.4rem 1.15rem 1.5rem;
+  }
+  .panel-actions {
+    gap: 0.75rem;
+  }
+  .panel-actions .btn-trailblaze {
+    flex: 1 1 100%;
   }
   .hsr-rays {
     left: 50%;

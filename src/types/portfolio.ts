@@ -22,31 +22,62 @@ export type TrailblazeTarget =
 
 export type CareerId = 'ukrida' | 'bca' | 'fifgroup'
 
-export interface Project {
+export type ProjectStatus = 'Live' | 'In Progress' | 'Archived' | 'Prototype'
+
+/**
+ * What you write in `src/data/projects.ts`.
+ * Only the un-marked fields are required — everything marked "auto" is filled in
+ * by `defineProjects()` when omitted.
+ */
+export interface ProjectInput {
+  /** Unique, kebab-case. Also used as the URL slug unless `slug` is given. */
   id: string
-  /** URL segment for `/projects/:slug`. */
-  slug: string
-  /** Tarot-style numeral shown on the card crown. */
-  arcana: string
+  /** auto: = id. URL segment for `/projects/:slug`. */
+  slug?: string
+  /** auto: tarot numeral from the array position (0, I, II … XXI, XXII …). */
+  arcana?: string
   title: string
-  /** One-line poetic subtitle kept short for the card front. */
+  /** One short poetic line for the card front. */
   epithet: string
   category: string
   year: number
-  status: 'Live' | 'In Progress' | 'Archived' | 'Prototype'
+  status: ProjectStatus
+  summary: string
+  /** auto: cycles through the six built-in emblems. */
+  motif?: RelicMotif
+  /** auto: alternates gold / crimson. */
+  accent?: AccentTone
+  /** Optional illustration (e.g. '/relics/foo.webp' in /public); replaces the SVG emblem. */
+  imageUrl?: string
+  /** auto: = summary. */
+  description?: string
+  architecture?: string[]
+  highlights?: string[]
+  techStack?: string[]
+  /** auto: internal route to this project's own dossier page. */
+  trailblaze?: TrailblazeTarget
+  repoUrl?: string
+  /** Career milestone this project belongs to — it then appears under that milestone automatically. */
+  careerId?: CareerId
+}
+
+/** Fully-resolved project used by every component. */
+export interface Project
+  extends Omit<
+    ProjectInput,
+    'slug' | 'arcana' | 'motif' | 'accent' | 'description' | 'architecture' | 'highlights' | 'techStack' | 'trailblaze'
+  > {
+  /** Position in the archive (0-based). */
+  index: number
+  slug: string
+  arcana: string
   motif: RelicMotif
   accent: AccentTone
-  /** Optional raster/vector illustration; replaces the SVG motif when present. */
-  imageUrl?: string
-  summary: string
   description: string
   architecture: string[]
   highlights: string[]
   techStack: string[]
   trailblaze: TrailblazeTarget
-  repoUrl?: string
-  /** Career milestone this project belongs to (links timeline ↔ gallery). */
-  careerId?: CareerId
 }
 
 export type MilestoneKind = 'Education' | 'Internship' | 'Full-Time / Program'
@@ -64,8 +95,11 @@ export interface CareerMilestone {
   summary: string
   domainFocus: string[]
   highlights: string[]
-  /** Project ids (from `projects.ts`) surfaced when this milestone is inspected. */
-  connectedProjectIds: string[]
+  /**
+   * Optional EXTRA project ids to show under this milestone.
+   * Projects with a matching `careerId` are linked automatically — no need to list them here.
+   */
+  connectedProjectIds?: string[]
   /** Small glyph rendered inside the timeline node. */
   sigil: 'quill' | 'vault' | 'compass'
   accent: AccentTone

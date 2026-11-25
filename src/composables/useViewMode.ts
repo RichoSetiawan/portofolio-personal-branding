@@ -12,9 +12,9 @@ function initialMode(): ViewMode {
   } catch {
     /* storage blocked — fall through to heuristics */
   }
-  const narrow = window.innerWidth < 768
+  // The scroll-driven stage adapts to phones too; only reduced-motion users start in the grid.
   const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  return narrow || reduced ? 'gallery' : 'stage'
+  return reduced ? 'gallery' : 'stage'
 }
 
 const viewMode = ref<ViewMode>(initialMode())
