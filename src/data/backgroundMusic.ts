@@ -1,8 +1,11 @@
 /**
  * Background music.
  *
- * - Off by default. It starts only when a visitor presses the ♪ button, because browsers
- *   block autoplaying sound. If they turned it on before, it resumes on their first click.
+ * - `autoplay: true` (default) means the music is ON for new visitors. It tries to start as soon as
+ *   the page opens. Most browsers block sound until the visitor interacts, so in practice it
+ *   starts on their first click, tap or key press anywhere on the page. Scrolling alone doesn't count.
+ *   Visitors can switch it off with the ♪ button, and that choice is remembered.
+ * - `autoplay: false` means OFF until the visitor presses ♪.
  * - Put the audio file in `public/audio/` and point `src` at it.
  *   The ♪ button stays hidden on the live site until that file exists.
  *   In `npm run dev` it shows dimmed with a hint instead.
@@ -21,6 +24,8 @@ export interface BackgroundMusicConfig {
   volume: number
   /** Shown in the footer credits when the track is available. */
   credit: string
+  /** true = on by default for new visitors (starts at the first interaction); false = off until ♪ is pressed. */
+  autoplay: boolean
 }
 
 export const backgroundMusic: BackgroundMusicConfig = {
@@ -28,5 +33,6 @@ export const backgroundMusic: BackgroundMusicConfig = {
   title: 'Ex Nihilo',
   artist: 'HOYO-MiX',
   volume: 0.35,
+  autoplay: true,
   credit: '“Ex Nihilo” — HOYO-MiX © HoYoverse',
 }

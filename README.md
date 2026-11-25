@@ -47,11 +47,12 @@ Required fields: `id`, `title`, `epithet`, `category`, `year`, `status` and `sum
 ### Background music
 
 1. Put the audio file in `public/audio/`, for example `public/audio/ex-nihilo.mp3`. The file is **not** included in this repo.
-2. Set the title, artist, volume and credit in `src/data/backgroundMusic.ts`. Set `src: ''` to remove the feature.
+2. Set the title, artist, volume, credit and `autoplay` in `src/data/backgroundMusic.ts`. Set `src: ''` to remove the feature.
 
 How it behaves:
-- It never autoplays on a first visit. Visitors start it with the ♪ button in the top bar.
-- Their choice is remembered. If they left it on, it resumes on their first click.
+- `autoplay: true` (the default) makes music **on by default**. It tries to start as soon as the page opens. Browsers block sound until the visitor interacts, so usually it starts on their first click, tap or key press anywhere on the page. Scrolling alone doesn't count; that's a browser rule.
+- `autoplay: false` keeps it off until the visitor presses the ♪ button in the top bar.
+- Visitors can switch it off with ♪, and that choice is remembered over the default.
 - It fades in and out (on iPhone too), pauses while the tab is hidden, and keeps playing across page changes.
 - It only downloads when someone presses play.
 - If the file is missing, the button is hidden on the live site. In `npm run dev` it shows dimmed with a hint.

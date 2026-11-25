@@ -4,17 +4,20 @@ import { backgroundMusic } from '@/data/backgroundMusic'
 /**
  * App-wide background music (singleton — survives route changes).
  *
- *  • Never autoplays on a first visit; starts on the ♪ button.
- *  • Remembers the visitor's choice; if it was "on", resumes on their first click/keypress
- *    (browsers only allow sound after a user gesture).
+ *  • With `autoplay: true`, music is ON for a visitor until they switch it off with ♪.
+ *    It tries to start when the page opens. Browsers usually block sound before any
+ *    interaction, so it then starts on the first click/tap/key press anywhere.
+ *  • Remembers the visitor's own choice ('on' / 'off') over the default.
  *  • Fades through a Web Audio GainNode, since iOS Safari ignores `audio.volume`.
- *  • Pauses while the tab is hidden; `preload="none"` so phones don't download it until asked.
+ *  • Pauses while the tab is hidden; `preload="none"`, so nothing downloads until it actually plays.
  *  • Hides itself when the file is missing (dev shows a dimmed button + hint instead).
  */
 
 const STORAGE_KEY = 'rs-archive:music'
 const FADE_IN = 1.8
 const FADE_OUT = 0.6
+/** Events that count as a "user activation" for sound. Touch only unlocks on finger-up (pointerup/touchend). */
+const GESTURES = ['pointerdown', 'pointerup', 'touchend', 'keydown'] as const
 
 const configured = Boolean(backgroundMusic.src)
 const available = ref(false)
@@ -27,13 +30,15 @@ let ctx: AudioContext | null = null
 let gain: GainNode | null = null
 let pauseTimer = 0
 let resumeWhenVisible = false
+let listening = false
 let initialised = false
 
-function readPref(): boolean {
+function readPref(): 'on' | 'off' | null {
   try {
-    return window.localStorage.getItem(STORAGE_KEY) === 'on'
+    const v = window.localStorage.getItem(STORAGE_KEY)
+    return v === 'on' || v === 'off' ? v : null
   } catch {
-    return false
+    return null
   }
 }
 function writePref(on: boolean) {
@@ -42,6 +47,11 @@ function writePref(on: boolean) {
   } catch {
     /* storage blocked */
   }
+}
+/** The visitor's own choice wins; otherwise the site default from the config. */
+function wantsMusic(): boolean {
+  const pref = readPref()
+  return pref === null ? backgroundMusic.autoplay : pref === 'on'
 }
 
 function ensureAudio(): HTMLAudioElement {
@@ -56,6 +66,7 @@ function ensureAudio(): HTMLAudioElement {
     available.value = false
     playing.value = false
     loading.value = false
+    removeGestureListeners()
   })
   return audio
 }
@@ -70,6 +81,7 @@ function ensureGraph(el: HTMLAudioElement) {
     gain = ctx.createGain()
     gain.gain.value = 0
     ctx.createMediaElementSource(el).connect(gain).connect(ctx.destination)
+    el.volume = 1 // the gain node does the fading from here on
   } catch {
     ctx = null
     gain = null
@@ -87,6 +99,10 @@ function fadeTo(target: number, seconds: number) {
   }
 }
 
+/** Resolve after `ms` at the latest; some browsers leave AudioContext.resume() pending while blocked. */
+const settle = (p: Promise<unknown> | undefined, ms: number) =>
+  Promise.race([p, new Promise((r) => window.setTimeout(r, ms))])
+
 function setMediaSession() {
   if (!('mediaSession' in navigator)) return
   try {
@@ -102,33 +118,63 @@ function setMediaSession() {
   }
 }
 
-async function play(): Promise<void> {
-  if (!available.value) return
+/**
+ * Try to start playback. Resolves `false` when the browser still blocks sound.
+ * `inGesture`: called from inside a click/tap/key handler.
+ */
+async function start(inGesture: boolean): Promise<boolean> {
+  if (!available.value) return false
+  if (playing.value) return true
   const el = ensureAudio()
-  ensureGraph(el)
   window.clearTimeout(pauseTimer)
   loading.value = true
   try {
-    if (ctx?.state === 'suspended') await ctx.resume()
-    if (!gain) el.volume = 0
-    await el.play()
+    if (inGesture) {
+      // Kick everything off synchronously inside the gesture; iOS Safari is strict about that.
+      ensureGraph(el)
+      if (!gain) el.volume = 0
+      const resumed = ctx?.state === 'suspended' ? ctx.resume() : undefined
+      await el.play()
+      await settle(resumed, 1500)
+    } else {
+      // No gesture: play() rejects at once when sound is blocked, before anything downloads.
+      // Only build the AudioContext after that, so blocked visits don't log autoplay warnings.
+      if (!gain) el.volume = 0
+      await el.play()
+      ensureGraph(el)
+      if (ctx?.state === 'suspended') await settle(ctx.resume(), 1500)
+    }
+    if (ctx && ctx.state !== 'running') throw new DOMException('Audio output still blocked', 'NotAllowedError')
     playing.value = true
-    fadeTo(backgroundMusic.volume, FADE_IN)
-    writePref(true)
-    setMediaSession()
-  } catch (err) {
-    playing.value = false
     loading.value = false
-    const name = (err as DOMException | undefined)?.name
-    if (name === 'NotSupportedError') available.value = false
+    fadeTo(backgroundMusic.volume, FADE_IN)
+    setMediaSession()
+    removeGestureListeners()
+    return true
+  } catch (err) {
+    if ((err as DOMException | undefined)?.name === 'NotSupportedError') available.value = false
+    if (!playing.value) {
+      el.pause()
+      loading.value = false
+    }
+    return false
   }
 }
 
+/** Explicit "turn it on" (♪ button, OS media controls). */
+async function play(): Promise<void> {
+  writePref(true)
+  await start(true)
+}
+
 function pause(remember = true) {
+  if (remember) {
+    writePref(false)
+    removeGestureListeners()
+  }
   if (!audio) return
   playing.value = false
   loading.value = false
-  if (remember) writePref(false)
   fadeTo(0, FADE_OUT)
   window.clearTimeout(pauseTimer)
   pauseTimer = window.setTimeout(() => {
@@ -141,16 +187,27 @@ function toggle() {
   else void play()
 }
 
-/* ---------- global listeners (registered once) ---------- */
-function onFirstGesture(e: Event) {
+/* ---------- global listeners ---------- */
+function onGesture(e: Event) {
   const target = e.target as Element | null
-  if (target?.closest?.('[data-music-toggle]')) return // the toggle handles itself
-  removeGestureListeners()
-  if (readPref() && !playing.value) void play()
+  if (target?.closest?.('[data-music-toggle]')) return // the ♪ button handles itself
+  if (playing.value || !wantsMusic()) {
+    removeGestureListeners()
+    return
+  }
+  // A touch's pointerdown doesn't unlock sound yet (its pointerup/touchend does), so skip it.
+  if (navigator.userActivation && !navigator.userActivation.isActive) return
+  void start(true)
+}
+function addGestureListeners() {
+  if (listening) return
+  listening = true
+  for (const type of GESTURES) window.addEventListener(type, onGesture, { capture: true, passive: true })
 }
 function removeGestureListeners() {
-  window.removeEventListener('pointerdown', onFirstGesture, true)
-  window.removeEventListener('keydown', onFirstGesture, true)
+  if (!listening) return
+  listening = false
+  for (const type of GESTURES) window.removeEventListener(type, onGesture, { capture: true })
 }
 
 function onVisibility() {
@@ -161,7 +218,7 @@ function onVisibility() {
     }
   } else if (resumeWhenVisible) {
     resumeWhenVisible = false
-    void play()
+    void start(false)
   }
 }
 
@@ -189,10 +246,10 @@ async function init() {
     return
   }
   document.addEventListener('visibilitychange', onVisibility)
-  if (readPref()) {
-    window.addEventListener('pointerdown', onFirstGesture, true)
-    window.addEventListener('keydown', onFirstGesture, true)
-  }
+  if (!wantsMusic()) return
+  addGestureListeners() // first click/tap/key anywhere starts it if the browser blocks the attempt below
+  if (document.hidden) resumeWhenVisible = true // opened in a background tab
+  else void start(false) // succeeds where the browser already allows sound (e.g. a site the visitor uses often)
 }
 
 export function useBackgroundMusic() {
