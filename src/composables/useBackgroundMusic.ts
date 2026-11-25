@@ -40,33 +40,26 @@ const files = import.meta.glob<string>('@/assets/audio/*.{mp3,m4a,aac,ogg,oga,op
 })
 
 /**
- * Best-effort title from a file name. Set exact titles in the config's `tracks` for messy names.
+ * Fallback title for songs not listed in the config's `tracks`: the file name, tidied up.
+ * It doesn't guess the artist, since downloaded names mix "Artist - Title" and "Title - Uploader".
  *  "01-ex-nihilo.mp3" → "Ex Nihilo"
- *  "HOYO-MiX - Ex Nihilo.mp3" → artist "HOYO-MiX", title "Ex Nihilo"
- *  "Artist - Title (Official Audio) - Uploader.mp3" → artist "Artist", title "Title"
+ *  "Song Name (Official Audio) - Channel.mp3" → "Song Name - Channel"
  */
-function describe(file: string): { title: string; artist?: string } {
-  let name = file
+function titleFromFile(file: string): string {
+  const name = file
     .replace(/\.[^.]+$/, '')
     .replace(/^\d+\s*[-_.]\s*/, '')
     .replace(/\s*[([][^)\]]*\b(official|audio|video|lyrics?|from|hd|4k|mv|ost)\b[^)\]]*[)\]]/gi, '')
     .replace(/\s+/g, ' ')
     .trim()
-  let artist: string | undefined
-  const parts = name.split(' - ').map((x) => x.trim())
-  if (parts.length >= 2) {
-    artist = parts[0]
-    name = parts[1] // a third part is usually the uploader
-  }
-  // keep names the author already cased; prettify plain lowercase slugs
-  const title = /\p{Lu}/u.test(name)
+  // keep names that are already cased; prettify plain lowercase slugs
+  return /\p{Lu}/u.test(name)
     ? name
     : name.replace(/[-_]+/g, ' ').replace(/(^|\s)(\p{L})/gu, (_, sp: string, c: string) => sp + c.toUpperCase())
-  return { title, artist }
 }
 
-/** Config keys are matched loosely (case and repeated spaces don't matter). */
-const norm = (s: string) => s.toLowerCase().replace(/\s+/g, ' ').trim()
+/** Config keys are matched loosely (case, repeated spaces and Unicode form don't matter). */
+const norm = (s: string) => s.normalize('NFC').toLowerCase().replace(/\s+/g, ' ').trim()
 const configured = Object.entries(backgroundMusic.tracks).map(([file, info], rank) => ({ key: norm(file), info, rank }))
 const byName = (a: string, b: string) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
 
@@ -74,13 +67,12 @@ const tracks: Track[] = Object.keys(files)
   .map((path) => {
     const file = path.slice(path.lastIndexOf('/') + 1)
     const entry = configured.find((c) => c.key === norm(file))
-    const auto = describe(file)
     const info = entry?.info ?? {}
     const track: Track = {
       file,
       url: files[path],
-      title: info.title ?? auto.title,
-      artist: info.artist ?? auto.artist ?? backgroundMusic.artist,
+      title: info.title ?? titleFromFile(file),
+      artist: info.artist ?? backgroundMusic.artist,
       credit: info.credit ?? backgroundMusic.credit,
     }
     return { track, rank: entry?.rank ?? Number.POSITIVE_INFINITY }

@@ -67,10 +67,55 @@ export const backgroundMusic: BackgroundMusicConfig = {
       title: 'Hope Is the Thing With Feathers',
       artist: 'Robin · HOYO-MiX',
     },
+    'EP If I Can Stop One Heart From Breaking  Honkai Star Rail - Honkai Star Rail.mp3': {
+      title: 'If I Can Stop One Heart From Breaking',
+      artist: 'Honkai: Star Rail',
+    },
+    'Honkai Star Rail EP Proi Proi - Honkai Star Rail.mp3': {
+      title: 'Proi Proi',
+      artist: 'Honkai: Star Rail',
+    },
+    'Da Capo — Honkai Impact 3rd Theme Song - Honkai Impact 3rd.mp3': {
+      title: 'Da Capo',
+      artist: 'Honkai Impact 3rd',
+    },
+    'Honkai Impact 3rd Valkyrie Theme Rubia (Performed by Zhou Shen) - Honkai Impact 3rd - Honkai Impact 3rd.mp3': {
+      title: 'Rubia',
+      artist: 'Zhou Shen · Honkai Impact 3rd',
+    },
+    'Honkai Impact 3 - วันที่เธอหายไปกับหมู่ดาว _ Hoshi To Kimi Ga Kieta Hi [Subthai_ซับไทย] - Ellen B. Sensei.mp3': {
+      title: 'Hoshi to Kimi ga Kieta Hi',
+      artist: 'Honkai Impact 3rd',
+    },
     'Aemeath Graduation Theme (Unwavering Startorch) Mix Version  Wuthering Waves - Yuyoiup.mp3': {
       title: 'Aemeath Graduation Theme (Unwavering Startorch)',
       artist: 'Wuthering Waves',
       credit: 'Wuthering Waves © Kuro Games',
+    },
+    'Tokino Mary (토키노 메리).Stellive 4th  Brave Shine - แปลไม่เก่ง.mp3': {
+      title: 'Brave Shine (cover)',
+      artist: 'Tokino Mary · Stellive',
+      credit: 'Tokino Mary (Stellive) cover, original by Aimer',
+    },
+    '【토키노 메리 (常乃メリ Tokino Mary)】怪獣の花唄 (Kaiju no Hanauta) _ Vaundy【直播翻唱】 - Vtuber歌切推廣.mp3': {
+      title: 'Kaiju no Hanauta (cover)',
+      artist: 'Tokino Mary · Stellive',
+      credit: 'Tokino Mary (Stellive) cover, original by Vaundy',
+    },
+    '🎵 【이름을 부를게 (名前を呼ぶよ) - Luck Life】Live cover 토키노 메리 - 음색창고.mp3': {
+      title: 'Namae wo Yobu yo (live cover)',
+      artist: 'Tokino Mary · Stellive',
+      credit: 'Tokino Mary (Stellive) cover, original by Luck Life',
+    },
+    'MONTAGEM HIKARI [EXTENDED] - INSVNIA.mp3': {
+      title: 'Montagem Hikari (Extended)',
+      artist: 'INSVNIA',
+      credit: 'INSVNIA',
+    },
+    'MONTAGEM KOE [EXTENDED] - INSVNIA.mp3': {
+      title: 'Montagem Koe (Extended)',
+      artist: 'INSVNIA',
+      credit: 'INSVNIA',
     },
   },
   artist: 'HOYO-MiX',
