@@ -1,0 +1,327 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   60 : 30 : 10 PALETTE
+   --------------------------------------------------------------------------
+   60  Dominant  — Cosmic void & deep velvet canvas      → page, canvas, base
+   30  Secondary — Planarcardia glass, fog, frames, type → panels, borders, text
+   10  Accent    — Aha crimson-magenta & mystic gold      → rims, nodes, CTA, hover
+   Rule of thumb: accents only on edges, glows, small glyphs and the Trailblaze
+   CTA. Never as a panel fill or body-text colour.
+   ========================================================================== */
+@theme {
+  /* 60% — dominant */
+  --color-void: #0a0914;
+  --color-void-2: #121024;
+
+  /* 30% — secondary */
+  --color-glass: rgba(28, 24, 54, 0.76);
+  --color-glass-strong: rgba(24, 20, 48, 0.92);
+  --color-frame: #3a3366;
+  --color-fog: #262150;
+  --color-starlight: #f4f2ff;
+  --color-mist: #a8a2c8;
+
+  /* 10% — accent */
+  --color-elation: #ff2a6d;
+  --color-gilt: #ffd166;
+
+  --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+
+  --ease-theatre: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-twinkle: twinkle 3.2s ease-in-out infinite;
+  --animate-drift: drift 9s ease-in-out infinite;
+
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @keyframes drift {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+}
+
+:root {
+  --hud-cut: 14px;
+  --hud-cut-sm: 8px;
+  --hud-height: 64px;
+  /* accent rim used by ornate borders */
+  --rim: linear-gradient(135deg, var(--color-gilt), var(--color-elation) 55%, var(--color-gilt));
+  color-scheme: dark;
+}
+
+/* ---------- Base ---------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--hud-height) + 16px);
+    background: var(--color-void);
+  }
+
+  body {
+    min-height: 100dvh;
+    margin: 0;
+    color: var(--color-mist);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(1200px 700px at 75% -10%, rgba(58, 51, 102, 0.35), transparent 60%),
+      radial-gradient(900px 600px at 0% 40%, rgba(38, 33, 80, 0.45), transparent 65%),
+      linear-gradient(180deg, var(--color-void) 0%, var(--color-void-2) 55%, var(--color-void) 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-starlight);
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
+  }
+
+  ::selection {
+    background: rgba(255, 42, 109, 0.35);
+    color: var(--color-starlight);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gilt);
+    outline-offset: 3px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-void);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-frame);
+    border: 2px solid var(--color-void);
+    border-radius: 10px;
+  }
+}
+
+/* ---------- Components (secondary 30% surfaces + accent 10% details) ---------- */
+@layer components {
+  /* Angled sci-fi HUD corners */
+  .hud-cut {
+    clip-path: polygon(
+      var(--hud-cut) 0,
+      100% 0,
+      100% calc(100% - var(--hud-cut)),
+      calc(100% - var(--hud-cut)) 100%,
+      0 100%,
+      0 var(--hud-cut)
+    );
+  }
+  .hud-cut-sm {
+    clip-path: polygon(
+      var(--hud-cut-sm) 0,
+      100% 0,
+      100% calc(100% - var(--hud-cut-sm)),
+      calc(100% - var(--hud-cut-sm)) 100%,
+      0 100%,
+      0 var(--hud-cut-sm)
+    );
+  }
+
+  /* Smoked-violet glass */
+  .glass-panel {
+    background: var(--color-glass);
+    border: 1px solid var(--color-frame);
+    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+  }
+
+  /* Glass panel with angled cut + a 1px frame that survives clip-path */
+  .hud-panel {
+    position: relative;
+    background:
+      linear-gradient(var(--color-glass), var(--color-glass)) padding-box,
+      linear-gradient(135deg, var(--color-frame), rgba(58, 51, 102, 0.4)) border-box;
+    border: 1px solid transparent;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  /* Ornate gold corner brackets (Umineko / LotM filigree feel) */
+  .ornate-corners {
+    position: relative;
+  }
+  .ornate-corners::before,
+  .ornate-corners::after {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    pointer-events: none;
+    border-color: var(--color-gilt);
+    opacity: 0.85;
+  }
+  /* --corner-inset must exceed the panel's --hud-cut / 2 so the cut never clips the bracket */
+  .ornate-corners::before {
+    top: var(--corner-inset, 6px);
+    left: var(--corner-inset, 6px);
+    border-top: 1px solid;
+    border-left: 1px solid;
+  }
+  .ornate-corners::after {
+    right: var(--corner-inset, 6px);
+    bottom: var(--corner-inset, 6px);
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+  }
+
+  .section-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-mist);
+  }
+  .section-kicker::before {
+    content: '';
+    width: 28px;
+    height: 1px;
+    background: var(--color-gilt);
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    color: var(--color-starlight);
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: 0.06em;
+  }
+
+  .sigil-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-frame);
+  }
+  .sigil-divider::before,
+  .sigil-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-frame), transparent);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: var(--color-starlight);
+    background: rgba(18, 16, 36, 0.7);
+    border: 1px solid var(--color-frame);
+    border-radius: 2px;
+  }
+
+  /* Secondary button — glass with frame, gold rim on hover */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-starlight);
+    background: var(--color-glass);
+    border: 1px solid var(--color-frame);
+    cursor: pointer;
+    transition:
+      border-color 0.25s var(--ease-theatre),
+      box-shadow 0.25s var(--ease-theatre),
+      color 0.25s;
+  }
+  .btn-ghost:hover {
+    border-color: var(--color-gilt);
+    box-shadow: 0 0 18px -6px var(--color-gilt);
+  }
+
+  /* Primary CTA — the only filled accent element on screen */
+  .btn-trailblaze {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.95rem 1.8rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-void);
+    background: linear-gradient(100deg, var(--color-gilt) 0%, #ffb27a 40%, var(--color-elation) 100%);
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+    transition:
+      transform 0.25s var(--ease-theatre),
+      filter 0.25s;
+  }
+  .btn-trailblaze::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.65) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 0.7s var(--ease-theatre);
+  }
+  .btn-trailblaze:hover {
+    transform: translateY(-2px);
+    filter: drop-shadow(0 0 14px rgba(255, 42, 109, 0.55));
+  }
+  .btn-trailblaze:hover::after {
+    transform: translateX(120%);
+  }
+  .btn-trailblaze:focus-visible {
+    outline-offset: 4px;
+  }
+}
+
+/* ---------- Motion safety ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
