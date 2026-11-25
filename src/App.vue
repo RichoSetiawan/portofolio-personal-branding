@@ -2,17 +2,22 @@
 import CosmicBackdrop from '@/components/CosmicBackdrop.vue'
 import HsrCardModal from '@/components/gallery/HsrCardModal.vue'
 import TrailblazeTransition from '@/components/TrailblazeTransition.vue'
+import EntryGate from '@/components/EntryGate.vue'
+import { useBackgroundMusic } from '@/composables/useBackgroundMusic'
+
+const { gate } = useBackgroundMusic()
 </script>
 
 <template>
   <CosmicBackdrop>
     <a class="skip-link" href="#main">Skip to content</a>
-    <div class="app-shell">
+    <div class="app-shell" :inert="gate === 'open'">
       <RouterView />
     </div>
     <!-- app-level overlays so they work from any route -->
     <HsrCardModal />
     <TrailblazeTransition />
+    <EntryGate />
   </CosmicBackdrop>
 </template>
 

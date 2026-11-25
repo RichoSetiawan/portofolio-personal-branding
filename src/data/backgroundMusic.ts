@@ -1,38 +1,81 @@
 /**
  * Background music.
  *
- * - `autoplay: true` (default) means the music is ON for new visitors. It tries to start as soon as
- *   the page opens. Most browsers block sound until the visitor interacts, so in practice it
- *   starts on their first click, tap or key press anywhere on the page. Scrolling alone doesn't count.
- *   Visitors can switch it off with the ♪ button, and that choice is remembered.
- * - `autoplay: false` means OFF until the visitor presses ♪.
- * - Put the audio file in `public/audio/` and point `src` at it.
- *   The ♪ button stays hidden on the live site until that file exists.
- *   In `npm run dev` it shows dimmed with a hint instead.
- * - Set `src: ''` to remove the feature completely.
+ * PLAYLIST
+ * - Every audio file in `src/assets/audio/` is picked up automatically at build time
+ *   (.mp3 .m4a .aac .ogg .opus .webm .wav .flac). Add or remove files there; nothing else to edit.
+ * - ORDER: songs listed in `tracks` below play first, in the order listed. Other files follow in
+ *   file-name order. After the last song the playlist starts again from the first.
+ *   A single song simply loops.
+ * - TITLES: guessed from the file name (`ex-nihilo.mp3` → "Ex Nihilo"). For downloaded files with
+ *   messy names, set `title`, `artist` and `credit` in `tracks`. Keys are the exact file names;
+ *   case and repeated spaces don't matter. In `npm run dev`, a typo in a key is reported in the console.
  *
- * ⚠️ Copyright: "Ex Nihilo" by HOYO-MiX is © HoYoverse / COGNOSPHERE. Hosting the track on a
- * public website redistributes it, so make sure you have permission before deploying.
- * See HoYoverse's fan-content policy, or use a track you have rights to.
+ * STARTING
+ * - `autoplay: true` means the music is ON for new visitors. It tries to start as soon as the page
+ *   opens. Browsers block sound until the visitor interacts with the page.
+ * - `entryGate: true` handles that block: a "Begin Trailblaze" entry screen appears, and its click
+ *   starts the music as the site opens. It's skipped when sound is already allowed, when there are
+ *   no audio files, or when the visitor chose "Enter without sound" before.
+ *   With `entryGate: false`, the music starts on the first click, tap or key press anywhere.
+ * - `autoplay: false` means OFF until the visitor presses ♪. Visitors' own on/off choice is remembered.
+ * - The ♪ button stays hidden on the live site while the folder is empty
+ *   (in `npm run dev` it shows dimmed with a hint). `enabled: false` removes the feature completely.
+ *
+ * ⚠️ Copyright: HOYO-MiX songs are © HoYoverse / COGNOSPHERE; Wuthering Waves music is © Kuro Games.
+ * Hosting the files on a public website redistributes them, so make sure you have permission
+ * before deploying (check each publisher's fan-content policy), or use tracks you have rights to.
  */
+
+/**
+ * 'playlist' = the order described above, then back to the first song.
+ * 'shuffle' = random order, reshuffled each round.
+ * 'repeat-one' = loop the first song forever.
+ */
+export type PlaybackMode = 'playlist' | 'shuffle' | 'repeat-one'
+
+export interface TrackInfo {
+  title?: string
+  artist?: string
+  /** Rights holder shown in the footer; defaults to `credit` below. */
+  credit?: string
+}
+
 export interface BackgroundMusicConfig {
-  /** Path under /public (e.g. '/audio/ex-nihilo.mp3') or a full URL you're allowed to stream. */
-  src: string
-  title: string
+  enabled: boolean
+  mode: PlaybackMode
+  /** Play order + per-file titles, keyed by file name, e.g. `'ex-nihilo.mp3': { title: 'Ex Nihilo' }`. */
+  tracks: Record<string, TrackInfo>
+  /** Artist for songs whose file name / `tracks` entry doesn't name one. */
   artist: string
   /** 0–1, the level the music fades up to. Keep it low so it stays "background". */
   volume: number
-  /** Shown in the footer credits when the track is available. */
+  /** Default footer credit after the song titles: Background music: “Ex Nihilo” — <credit>. */
   credit: string
   /** true = on by default for new visitors (starts at the first interaction); false = off until ♪ is pressed. */
   autoplay: boolean
+  /** true = "Begin Trailblaze" entry screen when the browser blocks sound (see above). */
+  entryGate: boolean
 }
 
 export const backgroundMusic: BackgroundMusicConfig = {
-  src: '/audio/ex-nihilo.mp3',
-  title: 'Ex Nihilo',
+  enabled: true,
+  mode: 'playlist',
+  tracks: {
+    'ex-nihilo.mp3': { title: 'Ex Nihilo', artist: 'HOYO-MiX' },
+    'Robin, HOYO-MiX - Hope Is the Thing With Feathers (Official Audio) (From Honkai Star Rail) - NARUMI.mp3': {
+      title: 'Hope Is the Thing With Feathers',
+      artist: 'Robin · HOYO-MiX',
+    },
+    'Aemeath Graduation Theme (Unwavering Startorch) Mix Version  Wuthering Waves - Yuyoiup.mp3': {
+      title: 'Aemeath Graduation Theme (Unwavering Startorch)',
+      artist: 'Wuthering Waves',
+      credit: 'Wuthering Waves © Kuro Games',
+    },
+  },
   artist: 'HOYO-MiX',
   volume: 0.35,
+  credit: 'HOYO-MiX © HoYoverse',
   autoplay: true,
-  credit: '“Ex Nihilo” — HOYO-MiX © HoYoverse',
+  entryGate: true,
 }

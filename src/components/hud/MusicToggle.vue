@@ -9,15 +9,18 @@ import { useBackgroundMusic } from '@/composables/useBackgroundMusic'
 
 withDefaults(defineProps<{ showLabel?: boolean }>(), { showLabel: true })
 
-const { track, available, devMissing, playing, loading, toggle } = useBackgroundMusic()
+const { current, available, devMissing, playing, loading, toggle } = useBackgroundMusic()
 
-const label = computed(() =>
-  playing.value
-    ? `Pause background music: ${track.title} by ${track.artist}`
-    : `Play background music: ${track.title} by ${track.artist}`,
-)
+const nowTitle = computed(() => current.value?.title ?? 'Music')
+const label = computed(() => {
+  const action = playing.value ? 'Pause background music' : 'Play background music'
+  const song = current.value ? `: ${current.value.title} by ${current.value.artist}` : ''
+  return action + song
+})
 const hint = computed(() =>
-  available.value ? `${track.title} — ${track.artist}` : `Add the audio file at public${track.src} to enable music`,
+  available.value && current.value
+    ? `${current.value.title} — ${current.value.artist}`
+    : 'Add audio files to src/assets/audio/ to enable music',
 )
 </script>
 
@@ -37,7 +40,7 @@ const hint = computed(() =>
     <span class="eq" aria-hidden="true"><i /><i /><i /><i /></span>
     <span v-if="showLabel" class="music-label" aria-hidden="true">
       <span class="music-state">{{ playing ? 'Now playing' : 'Music' }}</span>
-      <span class="music-title">{{ track.title }}</span>
+      <span class="music-title">{{ nowTitle }}</span>
     </span>
   </button>
 </template>
@@ -145,6 +148,9 @@ const hint = computed(() =>
   letter-spacing: 0.08em;
   color: var(--color-starlight);
   white-space: nowrap;
+  max-width: 11rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 1100px) {

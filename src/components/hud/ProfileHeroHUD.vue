@@ -12,9 +12,11 @@ import { projects } from '@/data/projects'
 import { careerTimeline } from '@/data/careerTimeline'
 import { useGallerySceneControls } from '@/composables/useGalleryScene'
 import { useReducedMotion } from '@/composables/useReducedMotion'
+import { useBackgroundMusic } from '@/composables/useBackgroundMusic'
 
 const scene = useGallerySceneControls()
 const reduced = useReducedMotion()
+const { onEntered } = useBackgroundMusic()
 
 const navItems = [
   { id: 'projects', label: 'Projects' },
@@ -68,15 +70,12 @@ onMounted(() => {
     if (el) io!.observe(el)
   })
 
-  // Hero entrance
+  // Hero entrance: held until the visitor is past the entry gate (if one is shown)
   if (!reduced.value && heroEl.value) {
-    gsap.from(heroEl.value.querySelectorAll('[data-hero]'), {
-      autoAlpha: 0,
-      y: 30,
-      duration: 1,
-      stagger: 0.09,
-      ease: 'power3.out',
-      delay: 0.15,
+    const bits = heroEl.value.querySelectorAll('[data-hero]')
+    gsap.set(bits, { autoAlpha: 0, y: 30 })
+    onEntered(() => {
+      gsap.to(bits, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.09, ease: 'power3.out', delay: 0.15 })
     })
   }
 })

@@ -18,6 +18,7 @@ All content is data-driven. You should rarely need to touch components.
 | Projects (relic cards, modal, dossier pages) | `src/data/projects.ts` |
 | Career & education chronicle 2022–2026 | `src/data/careerTimeline.ts` |
 | Contact Me social links | `src/data/socialLinks.ts` |
+| Background music playlist (files in `src/assets/audio/`) | `src/data/backgroundMusic.ts` |
 
 - **Before publishing:** replace the remaining `your-handle` entries in `socialLinks.ts`. Projects other than *Trailblaze Archive* are **sample entries** with `https://example.com` placeholder URLs.
 
@@ -46,18 +47,33 @@ Required fields: `id`, `title`, `epithet`, `category`, `year`, `status` and `sum
 
 ### Background music
 
-1. Put the audio file in `public/audio/`, for example `public/audio/ex-nihilo.mp3`. The file is **not** included in this repo.
-2. Set the title, artist, volume, credit and `autoplay` in `src/data/backgroundMusic.ts`. Set `src: ''` to remove the feature.
+**Playlist.** Every audio file in `src/assets/audio/` is picked up automatically at build time (`.mp3`, `.m4a`, `.aac`, `.ogg`, `.opus`, `.webm`, `.wav`, `.flac`). After a song ends, the next one plays. After the last song, it starts again from the first. A single song simply loops.
 
-How it behaves:
-- `autoplay: true` (the default) makes music **on by default**. It tries to start as soon as the page opens. Browsers block sound until the visitor interacts, so usually it starts on their first click, tap or key press anywhere on the page. Scrolling alone doesn't count; that's a browser rule.
+Settings live in `src/data/backgroundMusic.ts`:
+
+| Setting | What it does |
+| --- | --- |
+| `tracks` | Sets the play order: songs listed here play first, in that order, and other files follow by file name. Also sets each song's `title`, `artist` and footer `credit`. Use it for downloaded files with messy names. Keys are file names; case and repeated spaces don't matter. |
+| `mode` | `'playlist'` (default), `'shuffle'` (reshuffled each round) or `'repeat-one'` (loops the first song). |
+| `volume` | 0–1 fade-in level. The default is 0.35. |
+| `credit` | Default rights line in the footer. The footer lists every title, grouped by credit. |
+| `autoplay` / `entryGate` | See below. |
+| `enabled` | `false` removes the feature. |
+
+OS media keys and lock-screen controls support play, pause, next and previous. Only the song that is playing gets downloaded.
+
+**Starting:**
+- `autoplay: true` (the default) makes music **on by default**. It tries to start as soon as the page opens. Chrome, Safari and Firefox block sound until the visitor interacts with the page, and no site can bypass that.
+- `entryGate: true` (the default) handles that block. When the browser refuses, a **"Begin Trailblaze" entry screen** covers the site. Clicking or tapping anywhere on it is the interaction the browser needs, so the music starts as the site opens. The hero intro waits for it.
+- "Enter without sound" or Escape enters silently, and that choice is remembered.
+- The screen is skipped when the browser already allows sound (the music just plays), when the folder is empty, and for visitors who chose silence before.
+- With `entryGate: false` there is no screen. The music starts on the first click, tap or key press anywhere; scrolling alone doesn't count.
 - `autoplay: false` keeps it off until the visitor presses the ♪ button in the top bar.
 - Visitors can switch it off with ♪, and that choice is remembered over the default.
 - It fades in and out (on iPhone too), pauses while the tab is hidden, and keeps playing across page changes.
-- It only downloads when someone presses play.
-- If the file is missing, the button is hidden on the live site. In `npm run dev` it shows dimmed with a hint.
+- With no audio files, the ♪ button is hidden on the live site. In `npm run dev` it shows dimmed with a hint.
 
-⚠️ "Ex Nihilo" (HOYO-MiX) is © HoYoverse. Putting the file on a public website, or in a public Git repo, redistributes it. Check that you have permission (HoYoverse fan-content policy) before you deploy, or use a track you have rights to.
+⚠️ HOYO-MiX songs are © HoYoverse, and Wuthering Waves music is © Kuro Games. Putting the files on a public website, or in a public Git repo, redistributes them. Check each publisher's fan-content policy before you deploy, or use tracks you have rights to.
 
 ### 3D Stage controls
 
@@ -81,6 +97,7 @@ src/
 ├─ components/
 │  ├─ CosmicBackdrop.vue           owns the WebGL canvas, provides scene controls
 │  ├─ TrailblazeTransition.vue     full-screen wipe used by Trailblaze
+│  ├─ EntryGate.vue                "Begin Trailblaze" screen that unlocks background music
 │  ├─ hud/ProfileHeroHUD.vue · ViewModeToggle.vue
 │  ├─ gallery/GalleryStage.vue · ProjectRelicCard.vue · HsrCardModal.vue
 │  ├─ career/CareerTimelineSection.vue

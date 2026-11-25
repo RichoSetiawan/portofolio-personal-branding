@@ -10,7 +10,7 @@ import { useBackgroundMusic } from '@/composables/useBackgroundMusic'
 import { vReveal } from '@/directives/reveal'
 
 const reduced = useReducedMotion()
-const { track, available: musicAvailable } = useBackgroundMusic()
+const { creditLine, available: musicAvailable } = useBackgroundMusic()
 const year = new Date().getFullYear()
 
 function backToTop() {
@@ -58,7 +58,7 @@ function backToTop() {
           Built with Vue 3, Three.js &amp; GSAP. Fan-inspired aesthetic nodding to <em>Honkai: Star Rail</em> (HoYoverse),
           <em>Umineko When They Cry</em> (07th Expansion) and <em>Lord of the Mysteries</em> (Cuttlefish That Loves
           Diving). All artwork is original; not affiliated with or endorsed by these rights holders.
-          <template v-if="musicAvailable"> Background music: {{ track.credit }}.</template>
+          <template v-if="musicAvailable"> Background music: {{ creditLine }}.</template>
         </p>
         <button type="button" class="btn-ghost back-top" @click="backToTop">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6" /></svg>
