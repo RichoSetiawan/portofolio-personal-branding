@@ -71,6 +71,17 @@
     scroll-behavior: smooth;
     scroll-padding-top: calc(var(--hud-height) + 16px);
     background: var(--color-void);
+    /* No blinking text caret on page content (e.g. when the browser's caret browsing / F7 is on).
+       caret-color is inherited, so this covers the whole page. */
+    caret-color: transparent;
+  }
+
+  /* Real form fields (if any are added later) keep a visible caret */
+  input,
+  textarea,
+  select,
+  [contenteditable]:not([contenteditable='false']) {
+    caret-color: var(--color-gilt);
   }
 
   body {
