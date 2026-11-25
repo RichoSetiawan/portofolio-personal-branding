@@ -70,7 +70,9 @@ OS media keys and lock-screen controls support play, pause, next and previous. O
 - With `entryGate: false` there is no screen. The music starts on the first click, tap or key press anywhere; scrolling alone doesn't count.
 - `autoplay: false` keeps it off until the visitor presses the ♪ button in the top bar.
 - Visitors can switch it off with ♪, and that choice is remembered over the default.
-- It fades in and out (on iPhone too), pauses while the tab is hidden, and keeps playing across page changes.
+- It fades in and out (on iPhone too) and keeps playing across page changes.
+- With `playInBackground: true` (the default), it keeps playing when the visitor switches tabs or minimizes the browser. The browser's media controls (the ♫ icon in Chrome/Edge's toolbar, the phone's notification or lock screen) can pause it or skip songs. Set it to `false` to pause while the tab is hidden.
+- On phones the OS decides what happens in the background. Android Chrome usually keeps playing. iPhone Safari may stop the music when Safari itself goes to the background or the screen locks.
 - With no audio files, the ♪ button is hidden on the live site. In `npm run dev` it shows dimmed with a hint.
 
 ⚠️ HOYO-MiX songs are © HoYoverse, and Wuthering Waves music is © Kuro Games. Putting the files on a public website, or in a public Git repo, redistributes them. Check each publisher's fan-content policy before you deploy, or use tracks you have rights to.

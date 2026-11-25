@@ -56,6 +56,11 @@ export interface BackgroundMusicConfig {
   autoplay: boolean
   /** true = "Begin Trailblaze" entry screen when the browser blocks sound (see above). */
   entryGate: boolean
+  /**
+   * true = keep playing when the visitor switches tabs or minimizes the browser. They can still
+   * pause or skip from the browser's / phone's media controls. false = pause while the tab is hidden.
+   */
+  playInBackground: boolean
 }
 
 export const backgroundMusic: BackgroundMusicConfig = {
@@ -123,4 +128,5 @@ export const backgroundMusic: BackgroundMusicConfig = {
   credit: 'HOYO-MiX © HoYoverse',
   autoplay: true,
   entryGate: true,
+  playInBackground: true,
 }

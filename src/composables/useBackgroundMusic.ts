@@ -13,7 +13,8 @@ import { backgroundMusic } from '@/data/backgroundMusic'
  *    that first attempt. Its click is the gesture that unlocks sound, so the music starts as the site opens.
  *  • Remembers the visitor's own choice ('on' / 'off') over the default.
  *  • Fades through a Web Audio GainNode, since iOS Safari ignores `audio.volume`.
- *  • Pauses while the tab is hidden; `preload="none"`, so nothing downloads until it actually plays.
+ *  • Keeps playing in background tabs / minimized windows (`playInBackground`; false = pause while hidden).
+ *  • `preload="none"`, so nothing downloads until it actually plays.
  *  • Hides itself when the folder is empty (dev shows a dimmed button + hint instead).
  *  • OS media keys / lock-screen controls: play, pause, next, previous.
  */
@@ -186,6 +187,16 @@ function ensureGraph(el: HTMLAudioElement) {
   if (ctx) return
   const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
   if (!AC) return
+  // iOS/iPadOS Safari (16.4+): treat this as music playback, not UI sound, so the silent switch
+  // doesn't mute it and it isn't cut off as readily when Safari goes to the background.
+  const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession
+  if (session) {
+    try {
+      session.type = 'playback'
+    } catch {
+      /* not supported */
+    }
+  }
   try {
     ctx = new AC()
     gain = ctx.createGain()
@@ -392,6 +403,7 @@ function removeGestureListeners() {
 }
 
 function onVisibility() {
+  if (backgroundMusic.playInBackground) return // keeps playing in hidden tabs / minimized windows
   if (document.hidden) {
     if (playing.value) {
       resumeWhenVisible = true
