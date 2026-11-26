@@ -64,10 +64,10 @@ OS media keys and lock-screen controls support play, pause, next and previous. O
 
 **Starting:**
 - `autoplay: true` (the default) makes music **on by default**. It tries to start as soon as the page opens. Chrome, Safari and Firefox block sound until the visitor interacts with the page, and no site can bypass that.
-- `entryGate: true` (the default) handles that block. When the browser refuses, a **"Begin Trailblaze" entry screen** covers the site. Clicking or tapping anywhere on it is the interaction the browser needs, so the music starts as the site opens. The hero intro waits for it.
-- "Enter without sound" or Escape enters silently, and that choice is remembered.
-- The screen is skipped when the browser already allows sound (the music just plays), when the folder is empty, and for visitors who chose silence before.
-- With `entryGate: false` there is no screen. The music starts on the first click, tap or key press anywhere; scrolling alone doesn't count.
+- `entryGate` controls the **"Begin Trailblaze" entry screen**. Clicking or tapping anywhere on it is the interaction the browser needs, so the music starts as the site opens. The hero intro waits for it.
+  - `'always'` (the default) shows it on every page load: first visit, refresh and hard refresh. Moving between pages inside the site doesn't show it again. "Enter without sound" or Escape skips the music for that visit.
+  - `'when-blocked'` shows it only when the browser blocks sound. It's skipped when the browser already allows sound (the music just plays) and for visitors who chose silence before.
+  - `'off'` shows no screen. The music starts on the first click, tap or key press anywhere; scrolling alone doesn't count.
 - `autoplay: false` keeps it off until the visitor presses the ♪ button in the top bar.
 - Visitors can switch it off with ♪, and that choice is remembered over the default.
 - It fades in and out (on iPhone too) and keeps playing across page changes.

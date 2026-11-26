@@ -9,8 +9,8 @@ import { backgroundMusic } from '@/data/backgroundMusic'
  *  • With `autoplay: true`, music is ON for a visitor until they switch it off with ♪.
  *    It tries to start when the page opens. Browsers usually block sound before any
  *    interaction, so it then starts on the first click/tap/key press anywhere.
- *  • With `entryGate: true`, a "tap to begin" screen covers the site whenever the browser blocks
- *    that first attempt. Its click is the gesture that unlocks sound, so the music starts as the site opens.
+ *  • `entryGate` is a "Begin Trailblaze" screen whose click is the gesture that unlocks sound.
+ *    With 'always' it covers every page load; with 'when-blocked' only when the browser blocks sound.
  *  • Remembers the visitor's own choice ('on' / 'off') over the default.
  *  • Fades through a Web Audio GainNode, since iOS Safari ignores `audio.volume`.
  *  • Keeps playing in background tabs / minimized windows (`playInBackground`; false = pause while hidden).
@@ -119,7 +119,8 @@ const playing = ref(false)
 const loading = ref(false)
 
 /** 'checking' until we know whether the entry gate is needed; 'open' while it's shown. */
-const gate = ref<'checking' | 'open' | 'closed'>(gateMayBeNeeded() ? 'checking' : 'closed')
+const gateMode = backgroundMusic.entryGate
+const gate = ref<'checking' | 'open' | 'closed'>(initialGate())
 
 let audio: HTMLAudioElement | null = null
 let ctx: AudioContext | null = null
@@ -151,8 +152,15 @@ function wantsMusic(): boolean {
   return pref === null ? backgroundMusic.autoplay : pref === 'on'
 }
 
-function gateMayBeNeeded(): boolean {
-  return typeof window !== 'undefined' && enabled && backgroundMusic.entryGate && wantsMusic()
+/**
+ * 'always': up from the very first paint of every page load (no flash of the site first).
+ * 'when-blocked': 'checking' until init() knows whether the browser blocks sound.
+ */
+function initialGate(): 'checking' | 'open' | 'closed' {
+  if (typeof window === 'undefined') return 'closed'
+  if (gateMode === 'always') return 'open'
+  if (gateMode === 'when-blocked' && enabled && wantsMusic()) return 'checking'
+  return 'closed'
 }
 
 function ensureAudio(): HTMLAudioElement {
@@ -426,16 +434,18 @@ async function init() {
   }
   document.addEventListener('visibilitychange', onVisibility)
   if (!wantsMusic()) {
-    gate.value = 'closed'
+    if (gate.value === 'checking') gate.value = 'closed' // 'always' keeps its intro screen
     return
   }
-  addGestureListeners() // without a gate: the first click/tap/key anywhere starts it
+  addGestureListeners() // fallback: the first click/tap/key anywhere starts it
+  // 'always': the entry screen is already up, and its click starts the music.
+  if (gateMode === 'always') return
   // Without a gesture this only succeeds where the browser already allows sound
   // (e.g. a site the visitor uses often). Otherwise the entry gate asks for that click.
   let started = false
   if (document.hidden) resumeWhenVisible = true // opened in a background tab: try when it's shown
   else started = await start(false)
-  if (!started) gate.value = backgroundMusic.entryGate ? 'open' : 'closed'
+  if (!started) gate.value = gateMode === 'when-blocked' ? 'open' : 'closed'
 }
 
 /** Footer line, grouped by credit: “Ex Nihilo”, “…” — HOYO-MiX © HoYoverse; “…” — © Kuro Games */

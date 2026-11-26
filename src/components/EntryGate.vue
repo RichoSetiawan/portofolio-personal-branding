@@ -1,15 +1,15 @@
 <script setup lang="ts">
 /**
- * EntryGate — "Begin Trailblaze" screen.
- * Shown only when background music is on by default but the browser blocks sound until the
- * visitor interacts. The click on this screen is that interaction, so the music starts the
- * moment the site opens. Clicking anywhere enters with music; "Enter without sound" (or Escape)
- * enters silently and is remembered.
+ * EntryGate — "Begin Trailblaze" intro screen.
+ * When it shows is set by `entryGate` in src/data/backgroundMusic.ts: 'always' means every page
+ * load, 'when-blocked' means only when the browser blocks sound. Its click is the interaction
+ * browsers require before sound, so the music starts the moment the site opens.
+ * Clicking anywhere enters with music; "Enter without sound" (or Escape) enters silently.
  */
 import { nextTick, onUnmounted, watch, useTemplateRef } from 'vue'
 import { useBackgroundMusic } from '@/composables/useBackgroundMusic'
 
-const { gate, current, enter } = useBackgroundMusic()
+const { gate, current, available, enter } = useBackgroundMusic()
 const beginBtn = useTemplateRef<HTMLButtonElement>('beginBtn')
 const silentBtn = useTemplateRef<HTMLButtonElement>('silentBtn')
 
@@ -88,12 +88,12 @@ function onKeydown(e: KeyboardEvent) {
           Begin Trailblaze
         </button>
 
-        <p class="gate-now">
+        <p v-if="available" class="gate-now">
           <span class="gate-eq" aria-hidden="true"><i /><i /><i /></span>
           Sound on<template v-if="current"> · {{ current.title }} — {{ current.artist }}</template>
         </p>
 
-        <button ref="silentBtn" type="button" class="gate-silent" @click.stop="enter(false)">
+        <button v-if="available" ref="silentBtn" type="button" class="gate-silent" @click.stop="enter(false)">
           Enter without sound
         </button>
       </div>

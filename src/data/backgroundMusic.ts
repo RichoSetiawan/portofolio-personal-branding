@@ -14,10 +14,13 @@
  * STARTING
  * - `autoplay: true` means the music is ON for new visitors. It tries to start as soon as the page
  *   opens. Browsers block sound until the visitor interacts with the page.
- * - `entryGate: true` handles that block: a "Begin Trailblaze" entry screen appears, and its click
- *   starts the music as the site opens. It's skipped when sound is already allowed, when there are
- *   no audio files, or when the visitor chose "Enter without sound" before.
- *   With `entryGate: false`, the music starts on the first click, tap or key press anywhere.
+ * - `entryGate` is the "Begin Trailblaze" entry screen. Its click is the interaction that unlocks sound:
+ *     'always'       shows it on every page load (first visit, refresh, hard refresh).
+ *                    The music starts when it's clicked. "Enter without sound" skips the music for that visit.
+ *     'when-blocked' shows it only when the browser blocks sound. It's skipped when sound is already
+ *                    allowed (the music just plays) or when the visitor chose "Enter without sound" before.
+ *     'off'          means no screen; the music starts on the first click, tap or key press anywhere.
+ *   Moving between pages inside the site never shows it again.
  * - `autoplay: false` means OFF until the visitor presses ♪. Visitors' own on/off choice is remembered.
  * - The ♪ button stays hidden on the live site while the folder is empty
  *   (in `npm run dev` it shows dimmed with a hint). `enabled: false` removes the feature completely.
@@ -33,6 +36,9 @@
  * 'repeat-one' = loop the first song forever.
  */
 export type PlaybackMode = 'playlist' | 'shuffle' | 'repeat-one'
+
+/** When the "Begin Trailblaze" entry screen appears (see STARTING above). */
+export type EntryGateMode = 'always' | 'when-blocked' | 'off'
 
 export interface TrackInfo {
   title?: string
@@ -54,8 +60,8 @@ export interface BackgroundMusicConfig {
   credit: string
   /** true = on by default for new visitors (starts at the first interaction); false = off until ♪ is pressed. */
   autoplay: boolean
-  /** true = "Begin Trailblaze" entry screen when the browser blocks sound (see above). */
-  entryGate: boolean
+  /** 'always' | 'when-blocked' | 'off': when the "Begin Trailblaze" entry screen appears (see above). */
+  entryGate: EntryGateMode
   /**
    * true = keep playing when the visitor switches tabs or minimizes the browser. They can still
    * pause or skip from the browser's / phone's media controls. false = pause while the tab is hidden.
@@ -127,6 +133,6 @@ export const backgroundMusic: BackgroundMusicConfig = {
   volume: 0.35,
   credit: 'HOYO-MiX © HoYoverse',
   autoplay: true,
-  entryGate: true,
+  entryGate: 'always',
   playInBackground: true,
 }
